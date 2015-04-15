@@ -20,6 +20,12 @@ server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
 
+server.use(restify.throttle({
+  burst: 100,
+  rate: 50,
+  ip: true
+}));
+
 server.get({path : cityBasePath , version : '0.0.1'} , CityManager.findAllCities);
 
 
