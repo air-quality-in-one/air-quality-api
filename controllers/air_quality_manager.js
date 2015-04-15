@@ -1,7 +1,4 @@
 'use strict';
 
-function AirQualityManager () {
-
+exports.findAllCities = function (req, res , next) {
 }
-
-exports.AirQualityManager = AirQualityManager;
