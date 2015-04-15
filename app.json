@@ -1,0 +1,7 @@
+{
+  "name": "air-quality-api Nodejs Server",
+  "description": "air quality api",
+  "repository": "https://github.com/air-quality-in-one/air-quality-api.git",
+  "logo": "https://github.com/air-quality-in-one/air-quality-api.git",
+  "keywords": ["node", "rest", "air quality", "API"]
+}
