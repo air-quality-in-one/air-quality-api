@@ -32,4 +32,26 @@ var AirQualitySchema = new Schema({
 	}],
 });
 
+AirQualitySchema.static('loadLatestData', function(callback) {
+    this.aggregate([
+            { $sort : { city: 1, time_update : 1 } },
+            { $project : { city : 1 , time_update : 1, unit : 1, summary : 1 }},
+            { $group : {
+                _id : {
+   
+                    city : {$last : "$city"},
+                    time_update : {$last : "$time_update"},
+                    unit : {$last : "$unit"},
+                    summary : {$last : "$summary"}
+                    }
+            }}
+        ], function (err, qualityArray) {
+            if (err) {
+                console.log("Error when Load latest quality array : " + err);
+            }
+            console.log("Load latest quality array : " + JSON.stringify(qualityArray));
+            callback(null, qualityArray);
+        });
+});
+
 module.exports = mongoose.model('AirQuality', AirQualitySchema);
