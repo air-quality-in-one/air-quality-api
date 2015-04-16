@@ -29,9 +29,10 @@ server.use(restify.throttle({
 }));
 
 server.get({path : cityBasePath , version : '0.0.1'} , CityManager.findAllCities);
-server.get(
-    {path : qualityBasePath , version : '0.0.1'} , 
+server.get({path : qualityBasePath , version : '0.0.1'} , 
     AirQualityManager.findQualityForAllCities);
+server.get({path : qualityBasePath + '/:city', version : '0.0.1'} , 
+    AirQualityManager.findQuality);
 
 var dbUri;
 // check if run on heroku

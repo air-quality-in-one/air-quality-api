@@ -3,16 +3,15 @@
 var _ = require('lodash');
 var AirQuality = require('../models/air_quality');
 
-exports.findQualityForAllCities = function (req, res , next) {
+function findQualityForAllCities (req, res , next) {
 	var sort_by = req.query.sort_by;
-	AirQuality.loadLatestData(function (error, qualityArray) {
+	AirQuality.loadLatestQualityForAllCities(function (error, qualityArray) {
 		if (error) {
 			console.log("Error when load all cities : " + error);
 			res.setHeader('Access-Control-Allow-Origin','*');
 			res.send(500);
 			return next();
 		} else {
-			var qualityArraySorted;
 			if (sort_by != null) {
 				qualityArray = _.sortBy(qualityArray, function (quality) {
 					return parseInt(quality.summary[sort_by]);
@@ -24,3 +23,28 @@ exports.findQualityForAllCities = function (req, res , next) {
 		}
 	});
 }
+
+function findQuality (req, res , next) {
+	var city = req.params.city;
+	if (city == null || city === "") {
+		return findQualityForAllCities(req, res , next);
+	}
+	console.log("Load air quality for city : " + city);
+	AirQuality.loadLatestQualityForCity(city, function (error, qualityArray) {
+		if (error) {
+			console.log("Error when load all cities : " + error);
+			res.setHeader('Access-Control-Allow-Origin','*');
+			res.send(500);
+			return next();
+		} else {
+			res.setHeader('Access-Control-Allow-Origin','*');
+			var quality = _.last(qualityArray);
+			res.send(200, quality);
+			return next();
+		}
+	});
+}
+
+
+exports.findQualityForAllCities = findQualityForAllCities;
+exports.findQuality = findQuality;
