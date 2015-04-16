@@ -11,7 +11,7 @@ exports.findQualityForAllCities = function (req, res , next) {
 			return next();
 		} else {
 			res.setHeader('Access-Control-Allow-Origin','*');
-			res.send(200, "1111");
+			res.send(200, qualityArray);
 			return next();
 		}
 	});
