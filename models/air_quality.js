@@ -4,6 +4,7 @@ var mongoose = require('mongoose'),
     Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId;
 
+var moment = require('moment-timezone');
 var _ = require('lodash');
 var Summary = require('./quality_summary');
 var Station = require('./station_detail');
@@ -71,6 +72,7 @@ function loadSummaryDetail(qualityArray, callback) {
             }
             done();
         });
+        quality.time_update = moment.tz(quality.time_update, "Asia/Shanghai");
     });
 }
 
