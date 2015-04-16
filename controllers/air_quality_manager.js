@@ -15,7 +15,7 @@ exports.findQualityForAllCities = function (req, res , next) {
 			var qualityArraySorted;
 			if (sort_by != null) {
 				qualityArray = _.sortBy(qualityArray, function (quality) {
-					return quality.summary[sort_by];
+					return parseInt(quality.summary[sort_by]);
 				});
 			}
 			res.setHeader('Access-Control-Allow-Origin','*');
