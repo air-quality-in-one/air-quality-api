@@ -11,7 +11,7 @@ var CityManager = require('./controllers/city_manager'),
   AirQualityManager = require('./controllers/air_quality_manager');
 
 var cityBasePath = '/cities';
-var qualityBasePath = '/quality';
+var qualityBasePath = '/qualities';
 
 
 var server = restify.createServer({
