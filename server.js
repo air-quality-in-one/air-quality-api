@@ -28,6 +28,11 @@ server.use(restify.throttle({
   ip: true
 }));
 
+server.get('/health/', function (req, res, next) {
+  res.send("Welcome! All is well!");
+  return next();
+});
+
 server.get({path : cityBasePath , version : '0.0.1'} , CityManager.findAllCities);
 server.get({path : qualityBasePath , version : '0.0.1'} , 
     AirQualityManager.findQualityForAllCities);
