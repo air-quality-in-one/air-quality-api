@@ -62,7 +62,7 @@ function loadSummaryDetail(qualityArray, callback) {
     });
     _.each(qualityArray, function (quality) {
         Summary.findById(quality.summary)
-            .select('-_id')
+            .select('-_id -__v')
             .exec(function (error, summary) {
             if (error) {
                 console.log("Fail to load summary : " + quality.summary);
