@@ -72,7 +72,8 @@ function loadSummaryDetail(qualityArray, callback) {
             }
             done();
         });
-        quality.time_update = moment.tz(quality.time_update, "Asia/Shanghai");
+        quality.time_update = moment.tz(quality.time_update, "Asia/Shanghai").format();
+        //console.log("time_update : " + quality.time_update);
     });
 }
 
