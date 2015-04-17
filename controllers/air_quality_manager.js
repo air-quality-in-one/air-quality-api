@@ -7,7 +7,7 @@ var AirQuality = require('../models/air_quality');
 var AQIHistory = require('../models/aqi_history');
 
 function findQualityForAllCities (req, res , next) {
-	var sort_by = req.query.sort_by;
+	var sort_by = req.query.sort_by || 'aqi';
 	AirQuality.loadLatestQualityForAllCities(function (error, qualityArray) {
 		if (error) {
 			console.log("Error when load all cities : " + error);
@@ -15,11 +15,10 @@ function findQualityForAllCities (req, res , next) {
 			res.send(500);
 			return next();
 		} else {
-			if (sort_by != null) {
-				qualityArray = _.sortBy(qualityArray, function (quality) {
-					return parseInt(quality.summary[sort_by]);
-				});
-			}
+
+			qualityArray = _.sortBy(qualityArray, function (quality) {
+				return parseInt(quality.summary[sort_by]);
+			});
 			res.setHeader('Access-Control-Allow-Origin','*');
 			res.send(200, qualityArray);
 			return next();
