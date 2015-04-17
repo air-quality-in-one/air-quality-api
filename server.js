@@ -18,8 +18,9 @@ var rankBasePath = '/rank';
 var server = restify.createServer({
   name: 'air-quality-api',
   version: '1.0.0'
+
 });
-server.use(restify.acceptParser(server.acceptable));
+//server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
 
@@ -32,6 +33,11 @@ server.use(restify.throttle({
 server.pre(restify.pre.sanitizePath());
 
 restifyRoutes.set(server, __dirname + '/routers');
+
+server.get(/\/?.*/, restify.serveStatic({
+  directory: './docs/',
+  default: 'index.html'
+}));
 
 var dbUri;
 // check if run on heroku
