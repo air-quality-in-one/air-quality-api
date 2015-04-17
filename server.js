@@ -3,7 +3,8 @@
 require('newrelic');
 
 var restify = require('restify'),
-	mongoose = require('mongoose');
+	mongoose = require('mongoose'),
+  restifyRoutes = require('restify-routes');
 
 var settings = require('./config');
 
@@ -28,21 +29,9 @@ server.use(restify.throttle({
   ip: true
 }));
 
-server.get('/health/', function (req, res, next) {
-  res.send("Welcome! All is well!");
-  return next();
-});
+server.pre(restify.pre.sanitizePath());
 
-server.get({path : cityBasePath , version : '0.0.1'} , CityManager.findAllCities);
-server.get({path : cityBasePath + '/:city', version : '0.0.1'} , CityManager.findQuality);
-server.get({path : cityBasePath + '/:city/aqis/:date', version : '0.0.1'} , 
-    AirQualityManager.findAQIHistory);
-
-server.get({path : rankBasePath , version : '0.0.1'} , 
-    AirQualityManager.findQualityForAllCities);
-
-
-
+restifyRoutes.set(server, __dirname + '/routers');
 
 var dbUri;
 // check if run on heroku
