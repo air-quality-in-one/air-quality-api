@@ -1,43 +1,42 @@
 'use strict';
 
-require('newrelic');
-
-var restify = require('restify'),
+var express = require('express'),
+	bodyParser = require('body-parser'),
+	cookieParser = require('cookie-parser'),
+	session = require('express-session'),
+	compression = require('compression'),
 	mongoose = require('mongoose'),
-  restifyRoutes = require('restify-routes');
+	path = require('path');
 
 var settings = require('./config');
+var apiRootRouter = require('./routers/apiRootRouter').router;
+var apiV1Router = require('./routers/apiV1Router').router;
 
-var CityManager = require('./controllers/city_manager'),
-  AirQualityManager = require('./controllers/air_quality_manager');
+// Create our Express server
+var server = express();
+// Use environment defined port or 3000
+server.set('name', 'air-quality-api');
+server.set('port', (process.env.PORT || 3000));
+server.set('view engine', 'ejs');
 
-var cityBasePath = '/cities';
-var rankBasePath = '/rank';
-
-
-var server = restify.createServer({
-  name: 'air-quality-api',
-  version: '1.0.0'
-
-});
-//server.use(restify.acceptParser(server.acceptable));
-server.use(restify.queryParser());
-server.use(restify.bodyParser());
-/*
-server.use(restify.throttle({
-  burst: 100,
-  rate: 50,
-  ip: true
+server.use(compression());
+//static resources for stylesheets, images, javascript files
+server.use(express.static(path.join(__dirname, 'docs')));
+server.use(cookieParser());
+//Session Configuration
+server.use(session({
+  secret: 'keyboard cat',
+  cookie: {}
 }));
-*/
-server.pre(restify.pre.sanitizePath());
-
-restifyRoutes.set(server, __dirname + '/routers');
-
-server.get(/\/?.*/, restify.serveStatic({
-  directory: './docs/',
-  default: 'index.html'
+// Use the body-parser package in our application
+server.use(bodyParser.urlencoded({
+  extended: true
 }));
+
+
+// Register all our routes
+server.use('/v1', apiV1Router);
+server.use('/', apiRootRouter);
 
 var dbUri;
 // check if run on heroku
@@ -46,11 +45,12 @@ if (process.env.NODE_ENV === 'production') {
 } else {
   dbUri = settings.database.uri;
 }
+
 mongoose.connect(dbUri, function(err) {
   if (err) {
     throw err;
   }
-  server.listen((process.env.PORT || 5040), function () {
-  	console.log('%s listening at %s', server.name, server.url);
+  server.listen(server.get("port"), function () {
+  	console.log('%s listening at %s', server.get("name"), server.get("port"));
   });
 });

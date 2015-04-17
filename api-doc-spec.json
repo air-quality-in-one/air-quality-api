@@ -1,0 +1,364 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "全国空气质量指数",
+        "description": "“忘记从什么时候开始，用颜色表示空气” -- pm25.in",
+        "version": "1.0.0"
+    },
+    "host": "air-quality-api.herokuapp.com",
+    "basePath": "/v1",
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/cities": {
+            "get": {
+                "summary": "获取实施了新《环境空气质量标准》的城市列表，即有PM2.5数据的城市列表",
+                "description": "获取实施了新《环境空气质量标准》的城市列表，即有PM2.5数据的城市列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "hot",
+                        "description": "是否指包含热门城市",
+                        "required": false,
+                        "type": "boolean",
+                        "default": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回实施了新《环境空气质量标准》的城市列表，即有PM2.5数据的城市列表",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/City"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误"
+                    }
+                }
+            }
+        },
+        "/cities/{city}": {
+            "get": {
+                "summary": "获取一个城市的空气质量详细数据",
+                "description": "获取一个城市的空气质量详细数据",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "city",
+                        "in": "path",
+                        "type": "string",
+                        "description": "城市的中文拼音。例如：上海的拼音“shanghai”",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回该城市最新的空气质量详情",
+                        "schema": {
+                            "$ref": "#/definitions/AirQualityDetail"
+                        }
+                    },
+                    "400": {
+                        "description": "参数不合法，如该城市不支持PM2.5数据的查询"
+                    },
+                    "404": {
+                        "description": "找不到该城市的空气质量数据"
+                    },
+                    "500": {
+                        "description": "服务器内部错误"
+                    }
+                }
+            }
+        },
+        "/cities/{city}/aqis/{date}": {
+            "get": {
+                "summary": "获取一个城市指定日期的AQI指数详细数据",
+                "description": "获取一个城市指定日期的AQI指数详细数据",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "city",
+                        "in": "path",
+                        "type": "string",
+                        "description": "城市的中文拼音。例如：上海的拼音“shanghai”",
+                        "required": true
+                    },
+                    {
+                        "name": "date",
+                        "in": "path",
+                        "type": "string",
+                        "description": "查询的日期。格式为YYYY-MM-DD，如“2015-04-12”",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回该城市该天每小时的AQI指数",
+                        "schema": {
+                            "$ref": "#/definitions/AQIHistory"
+                        }
+                    },
+                    "400": {
+                        "description": "参数不合法"
+                    },
+                    "404": {
+                        "description": "找不到该城市改天的空气质量数据"
+                    },
+                    "500": {
+                        "description": "服务器内部错误"
+                    }
+                }
+            }
+        },
+        "/rank": {
+            "get": {
+                "summary": "获取全部城市的空气质量指数(AQI)排行榜",
+                "description": "获取全部城市的空气质量指数(AQI)排行榜",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "sort_by",
+                        "description": "根据该项排序，如“aqi，pm_2_5，pm_10，co，no2，o3，o3_8h，so2”",
+                        "required": false,
+                        "type": "string",
+                        "default": "aqi"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回全部城市的空气质量指数(AQI)排行榜",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/AirQualitySummary"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "City": {
+            "properties": {
+                "spell": {
+                    "type": "string",
+                    "description": "城市的中文拼音。例如：上海的拼音“shanghai”"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "城市的中文名字。例如：“上海”"
+                }
+            }
+        },
+        "AQIHistory": {
+            "properties": {
+                "city": {
+                    "type": "string",
+                    "description": "城市的中文拼音。例如：上海的拼音“shanghai”"
+                },
+                "report_date": {
+                    "type": "string",
+                    "description": "空气质量发布的日期,格式为YYYY-MM-DD，如“2015-04-12”"
+                },
+                "aqis": {
+                    "description": "该城市整天每小时的AQI指数",
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "description": "该时刻对应的AQI指数"
+                    }
+                }
+            }
+        },
+        "AirQualityDetail": {
+            "properties": {
+                "city": {
+                    "type": "string",
+                    "description": "城市的中文拼音。例如：上海的拼音“shanghai”"
+                },
+                "time_update": {
+                    "type": "string",
+                    "description": "空气质量发布的时间,ISO-8601格式，如“2015-04-17T11:00:00+08:00”"
+                },
+                "unit": {
+                    "type": "string",
+                    "description": "空气质量指数的单位"
+                },
+                "summary": {
+                    "type": "object",
+                    "$ref": "#/definitions/Summary",
+                    "description": "空气质量指数详情"
+                },
+                "stations": {
+                    "description": "该城市各监测站的空气质量指数详情",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Station"
+                    }
+                }
+            }
+        },
+        "AirQualitySummary": {
+            "properties": {
+                "city": {
+                    "type": "string",
+                    "description": "城市的中文拼音。例如：上海的拼音“shanghai”"
+                },
+                "time_update": {
+                    "type": "string",
+                    "description": "空气质量发布的时间,ISO-8601格式，如“2015-04-17T11:00:00+08:00”"
+                },
+                "unit": {
+                    "type": "string",
+                    "description": "空气质量指数的单位"
+                },
+                "summary": {
+                    "type": "object",
+                    "$ref": "#/definitions/Summary",
+                    "description": "空气质量指数详情"
+                }
+            }
+        },
+        "Summary": {
+            "properties": {
+                "level": {
+                    "type": "string",
+                    "description": "空气质量指数级别"
+                },
+                "quality": {
+                    "type": "string",
+                    "description": "空气质量指数类别，有“优、良、轻度污染、中度污染、重度污染、严重污染”6类"
+                },
+                "primary_pollutant": {
+                    "type": "string",
+                    "description": "首要污染物"
+                },
+                "affect": {
+                    "type": "string",
+                    "description": "对健康影响情况"
+                },
+                "action": {
+                    "type": "string",
+                    "description": "建议采取的措施"
+                },
+                "aqi": {
+                    "type": "string",
+                    "description": "空气质量指数(AQI)，即air quality index，是定量描述空气质量状况的无纲量指数"
+                },
+                "pm_2_5": {
+                    "type": "string",
+                    "description": "颗粒物（粒径小于等于2.5μm）1小时平均"
+                },
+                "pm_10": {
+                    "type": "string",
+                    "description": "颗粒物（粒径小于等于10μm）1小时平均"
+                },
+                "co": {
+                    "type": "string",
+                    "description": "一氧化碳1小时平均"
+                },
+                "no2": {
+                    "type": "string",
+                    "description": "二氧化氮1小时平均"
+                },
+                "o3": {
+                    "type": "string",
+                    "description": "臭氧1小时平均"
+                },
+                "o3_8h": {
+                    "type": "string",
+                    "description": "臭氧8小时滑动平均"
+                },
+                "so2": {
+                    "type": "string",
+                    "description": "二氧化硫1小时平均"
+                }
+            }
+        },
+        "Station": {
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "监测点名称"
+                },
+                "aqi": {
+                    "type": "string",
+                    "description": "空气质量指数(AQI)，即air quality index，是定量描述空气质量状况的无纲量指数"
+                },
+                "quality": {
+                    "type": "string",
+                    "description": "空气质量指数级别"
+                },
+                "primary_pollutant": {
+                    "type": "string",
+                    "description": "首要污染物"
+                },
+                "pm_2_5": {
+                    "type": "string",
+                    "description": "颗粒物（粒径小于等于2.5μm）1小时平均"
+                },
+                "pm_10": {
+                    "type": "string",
+                    "description": "颗粒物（粒径小于等于10μm）1小时平均"
+                },
+                "co": {
+                    "type": "string",
+                    "description": "一氧化碳1小时平均"
+                },
+                "no2": {
+                    "type": "string",
+                    "description": "二氧化氮1小时平均"
+                },
+                "o3": {
+                    "type": "string",
+                    "description": "臭氧1小时平均"
+                },
+                "o3_8h": {
+                    "type": "string",
+                    "description": "臭氧8小时滑动平均"
+                },
+                "so2": {
+                    "type": "string",
+                    "description": "二氧化硫1小时平均"
+                }
+            }
+        }
+    }
+}

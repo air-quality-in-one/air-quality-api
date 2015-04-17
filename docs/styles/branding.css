@@ -3,3 +3,14 @@
  * customize Swagger Editor you can serve this file with your CSS that overrides
  * or extends Swagger Editor styling.
 */
+
+.ui-splitbar {
+	display : none;
+	width : 0px;
+	left : 0px;
+}
+
+.preview.pane {
+	width : 100%;
+	left : 20px;
+}

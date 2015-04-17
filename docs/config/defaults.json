@@ -5,10 +5,22 @@
     "server": "http://generator.swagger.io/api/gen/servers/{language}",
     "client": "http://generator.swagger.io/api/gen/clients/{language}"
   },
+  "analytics": {
+    "google": {
+      "id": ""
+    }
+  },
   "disableCodeGen": false,
   "examplesFolder": "/spec-files/",
   "exampleFiles": [
-    "default.yaml"
+    "default.yaml",
+    "heroku-pets.yaml",
+    "minimal.yaml",
+    "echo.yaml",
+    "petstore_simple.yaml",
+    "petstore_full.yaml",
+    "basic-auth.yaml",
+    "security.yaml"
   ],
   "autocompleteExtension": {},
   "useBackendForStorage": false,
