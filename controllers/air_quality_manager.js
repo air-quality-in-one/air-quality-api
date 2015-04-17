@@ -33,22 +33,25 @@ function findQuality (req, res , next) {
 		return findQualityForAllCities(req, res , next);
 	}
 	console.log("Load air quality for city : " + city);
-	AirQuality.loadLatestQualityForCity(city, function (error, qualityArray) {
+	AirQuality.loadLatestQualityForCity(city, function (error, quality) {
 		if (error) {
 			console.log("Error when load all cities : " + error);
 			res.setHeader('Access-Control-Allow-Origin','*');
 			res.send(500);
 			return next();
+		} else if (quality == null) {
+			res.setHeader('Access-Control-Allow-Origin','*');
+			res.send(404, "No Data Found!");
+			return next();
 		} else {
 			res.setHeader('Access-Control-Allow-Origin','*');
-			var quality = _.last(qualityArray);
 			res.send(200, quality);
 			return next();
 		}
 	});
 }
 
-function findQualityHistory(req, res , next) {
+function findAQIHistory(req, res , next) {
 	var city = req.params.city;
 	var date = req.params.date;
 	console.log(city + " : " + date);
@@ -89,4 +92,4 @@ function isValidDate(date) {
 
 exports.findQualityForAllCities = findQualityForAllCities;
 exports.findQuality = findQuality;
-exports.findQualityHistory = findQualityHistory;
+exports.findAQIHistory = findAQIHistory;

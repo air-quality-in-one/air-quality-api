@@ -11,7 +11,7 @@ var CityManager = require('./controllers/city_manager'),
   AirQualityManager = require('./controllers/air_quality_manager');
 
 var cityBasePath = '/cities';
-var qualityBasePath = '/qualities';
+var rankBasePath = '/rank';
 
 
 var server = restify.createServer({
@@ -35,13 +35,11 @@ server.get('/health/', function (req, res, next) {
 
 server.get({path : cityBasePath , version : '0.0.1'} , CityManager.findAllCities);
 server.get({path : cityBasePath + '/:city', version : '0.0.1'} , CityManager.findQuality);
-server.get({path : cityBasePath + '/:city/histories/:date', version : '0.0.1'} , 
-    AirQualityManager.findQualityHistory);
+server.get({path : cityBasePath + '/:city/aqis/:date', version : '0.0.1'} , 
+    AirQualityManager.findAQIHistory);
 
-server.get({path : qualityBasePath , version : '0.0.1'} , 
+server.get({path : rankBasePath , version : '0.0.1'} , 
     AirQualityManager.findQualityForAllCities);
-server.get({path : qualityBasePath + '/:city', version : '0.0.1'} , 
-    AirQualityManager.findQuality);
 
 
 

@@ -50,9 +50,14 @@ AirQualitySchema.static('loadLatestQualityForCity', function(city, callback) {
         .exec(function (err, qualityArray) {
             if (err) {
                 console.log("Error when Load latest quality array : " + err);
+                return callback(err);
+            }
+            if (_.isEmpty(qualityArray)) {
+                console.log("No Quality found for city : " + city);
+                return callback(null, null);
             }
             //console.log("Load latest quality array : " + JSON.stringify(qualityArray));
-            loadSummaryDetail(qualityArray, function(err, qualityArray){
+            return loadSummaryDetail(qualityArray, function(err, qualityArray){
                 if (err) {
                     console.log("Error when loading summary detail : " + err);
                 }
@@ -77,6 +82,7 @@ AirQualitySchema.static('loadLatestQualityForAllCities', function(callback) {
         .exec(function (err, qualityArray) {
             if (err) {
                 console.log("Error when Load latest quality array : " + err);
+                return callback(err);
             }
             //console.log("Load latest quality array : " + JSON.stringify(qualityArray));
             return loadSummaryDetail(qualityArray, callback);
@@ -113,7 +119,7 @@ function loadStations(qualityArray, callback) {
     //console.log("Try to load summary detail of  AirQuality : " + JSON.stringify(qualityArray));
     var done = _.after(qualityArray.length, function() {
         //console.log('done load AirQuality list : ' + JSON.stringify(qualityArray));
-        return callback(null, qualityArray);
+        return callback(null, _.first(qualityArray));
     });
     _.each(qualityArray, function (quality) {
         loadStationDetail(quality, done);
