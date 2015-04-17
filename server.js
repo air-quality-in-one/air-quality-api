@@ -50,7 +50,7 @@ mongoose.connect(dbUri, function(err) {
   if (err) {
     throw err;
   }
-  server.listen((process.env.PORT || 5010), function () {
+  server.listen((process.env.PORT || 5030), function () {
   	console.log('%s listening at %s', server.name, server.url);
   });
 });
