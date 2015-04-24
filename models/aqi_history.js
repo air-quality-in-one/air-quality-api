@@ -35,7 +35,7 @@ AQIHistorySchema.static('findByCityAndDate', function(city, date, callback) {
         if (err) {
             return callback(err);
         } else {
-            console.log("Loaded AirQuality : " + JSON.stringify(historyArray));
+            console.log("Loaded AQIHistory : " + JSON.stringify(historyArray));
             return callback(null, _.first(historyArray));
         }
     });
