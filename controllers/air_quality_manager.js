@@ -117,7 +117,7 @@ function findAQIHistory(req, res , next) {
 function rollup_quality_history (qualityArray, callback) {
 	var aqiArray = new Array(24);
 	_.fill(aqiArray, "", 0, 24);
-	_.each(_.sortBy(quality, 'time_update'), function (qualitySorted) {
+	_.each(_.sortBy(qualityArray, 'time_update'), function (qualitySorted) {
 		var time = moment.tz(qualitySorted.time_update, "Asia/Shanghai");
 		var hour = time.hour();
 		aqiArray[hour] = qualitySorted.summary.aqi;
