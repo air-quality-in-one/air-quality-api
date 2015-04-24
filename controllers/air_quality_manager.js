@@ -3,6 +3,8 @@
 var _ = require('lodash');
 var moment = require('moment-timezone');
 
+var DateUtil = require('../utils/date_util');
+
 var AirQuality = require('../models/air_quality');
 var AQIHistory = require('../models/aqi_history');
 
@@ -62,23 +64,63 @@ function findAQIHistory(req, res , next) {
 		return next();
 	}
 
-	AQIHistory.findByCityAndDate(city, date, function (error, historyRecord) {
-		if (error) {
-			console.log("Error when load history : " + error);
-			res.setHeader('Access-Control-Allow-Origin','*');
-			res.send(500);
-			return next();
-		} else if (historyRecord == null) {
-			res.setHeader('Access-Control-Allow-Origin','*');
-			res.send(404, "No Data Found!");
-			return next();
-		} else {
-			res.setHeader('Access-Control-Allow-Origin','*');
-			res.send(200, historyRecord);
-			return next();
-		}
-	});
+	if(DateUtil.isDateWithinXDays(date) == true) {
+		AirQuality.loadAQIDataByCityAndDate(city, date, function (error, qualityArray) {
+			if (error) {
+				res.setHeader('Access-Control-Allow-Origin','*');
+				res.send(404, "No Data Found!");
+				return next();
+			} else {
+				rollup_quality_history(qualityArray, function (error, aqiArray) {
+					if (error) {
+						res.setHeader('Access-Control-Allow-Origin','*');
+						res.send(404, "No Data Found!");
+						return next();
+					} else {
+						var historyRecord = {
+							city : city,
+							report_date : date,
+							aqis : aqiArray
+						};
+						res.setHeader('Access-Control-Allow-Origin','*');
+						res.send(200, historyRecord);
+						return next();
+					}
+				});
+			}
+		});
+	} else {
+		AQIHistory.findByCityAndDate(city, date, function (error, historyRecord) {
+			if (error) {
+				console.log("Error when load history : " + error);
+				res.setHeader('Access-Control-Allow-Origin','*');
+				res.send(500);
+				return next();
+			} else if (historyRecord == null) {
+				res.setHeader('Access-Control-Allow-Origin','*');
+				res.send(404, "No Data Found!");
+				return next();
+			} else {
+				res.setHeader('Access-Control-Allow-Origin','*');
+				res.send(200, historyRecord);
+				return next();
+			}
+		});
+	}
+
+
 	
+}
+
+function rollup_quality_history (qualityArray, callback) {
+	var aqiArray = new Array(24);
+	_.fill(aqiArray, "", 0, 24);
+	_.each(_.sortBy(quality, 'time_update'), function (qualitySorted) {
+		var time = moment.tz(qualitySorted.time_update, "Asia/Shanghai");
+		var hour = time.hour();
+		aqiArray[hour] = qualitySorted.summary.aqi;
+	});
+	return callback(null, aqiArray);
 }
 
 function isValidDate(date) {

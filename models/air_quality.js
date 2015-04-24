@@ -6,6 +6,7 @@ var mongoose = require('mongoose'),
 
 var moment = require('moment-timezone');
 var _ = require('lodash');
+
 var Summary = require('./quality_summary');
 var Station = require('./station_detail');
 
@@ -31,6 +32,29 @@ var AirQualitySchema = new Schema({
 		type: ObjectId,
 		ref: 'Station'
 	}],
+});
+
+AirQualitySchema.static('loadAQIDataByCityAndDate', function(city, date, callback) {
+    var startTime = moment.tz(date, "Asia/Shanghai").startOf('day').format();
+    var endTime = moment.tz(date, "Asia/Shanghai").add(1, 'day').startOf('day').format();
+    console.log("Try to load AirQuality from " + startTime + " to " + endTime);
+    var query = {
+        "city" : city,
+        "time_update" : {
+            "$gte" : startTime,
+            "$lt" : endTime
+        }
+    };
+    this.find(query).populate('summary', 'aqi -_id')
+        .select('city time_update summary -_id')
+        .exec(function(err, qualityArray) {
+        if (err) {
+            return callback(err);
+        } else {
+            //console.log("Loaded AirQuality : " + JSON.stringify(qualityArray));
+            return callback(null, qualityArray);
+        }
+    });
 });
 
 AirQualitySchema.static('loadLatestQualityForCity', function(city, callback) {
