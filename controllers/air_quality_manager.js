@@ -65,6 +65,7 @@ function findAQIHistory(req, res , next) {
 	}
 
 	if(DateUtil.isDateWithinXDays(date) == true) {
+		console.log("Load History from AirQuality!");
 		AirQuality.loadAQIDataByCityAndDate(city, date, function (error, qualityArray) {
 			if (error) {
 				res.setHeader('Access-Control-Allow-Origin','*');
@@ -90,6 +91,7 @@ function findAQIHistory(req, res , next) {
 			}
 		});
 	} else {
+		console.log("Load History from AirQuality!");
 		AQIHistory.findByCityAndDate(city, date, function (error, historyRecord) {
 			if (error) {
 				console.log("Error when load history : " + error);
